@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HUNTERS CRICKET TOURNAMENT – Admin Login</title>
+  <meta name="description" content="Admin login for Hunters Cricket Tournament 2026" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── LOGIN PAGE SPECIFIC ── */
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* cricket pitch lines decoration */
+    .login-page::after {
+      content: '';
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60vh;
+      background: linear-gradient(180deg, transparent, rgba(16,185,129,0.04));
+      border-left: 1px solid rgba(16,185,129,0.08);
+      border-right: 1px solid rgba(16,185,129,0.08);
+      pointer-events: none;
+    }
+
+    /* glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(246,201,14,0.10) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      animation: fadeIn 0.6s ease both;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Logo / Title Area */
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-cricket-icon {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .login-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent-gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+    }
+
+    .login-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .year-tag {
+      display: inline-block;
+      padding: 2px 10px;
+      background: rgba(246,201,14,0.1);
+      border: 1px solid rgba(246,201,14,0.3);
+      border-radius: 20px;
+      color: var(--accent-gold);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: 8px;
+    }
+
+    /* Login Card */
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 36px 36px 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold), var(--accent-blue));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+
+    .login-card-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .input-icon-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .input-icon-wrap .form-control {
+      padding-left: 42px;
+    }
+
+    /* error message */
+    .error-msg {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: var(--radius-md);
+      color: #fca5a5;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      animation: fadeIn 0.3s ease;
+    }
+    .error-msg.show { display: flex; }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-top: 8px;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .participant-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      color: var(--accent-blue-light);
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .participant-link:hover { color: var(--accent-gold); }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 24px 20px; }
+      .login-title { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <main class="login-page">
+    <div class="login-container">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <span class="login-cricket-icon">🏏</span>
+        <h1 class="login-title">HUNTERS<br/>CRICKET<br/>TOURNAMENT</h1>
+        <p class="login-subtitle">Official Tournament Management Portal</p>
+        <span class="year-tag">SEASON 2026</span>
+      </div>
+
+      <!-- Login Card -->
+      <div class="login-card">
+        <p class="login-card-title">🔐 Admin Access</p>
+
+        <div id="errorMsg" class="error-msg">
+          <span>⚠️</span>
+          <span id="errorText">Invalid credentials. Please try again.</span>
+        </div>
+
+        <form id="loginForm" onsubmit="doLogin(event)" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">👤</span>
+              <input
+                type="text"
+                id="username"
+                class="form-control"
+                placeholder="Enter username"
+                autocomplete="username"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔒</span>
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+          </div>
+
+          <div id="errorMsg2" class="error-msg">
+            <span>⚠️</span>
+            <span id="errorText2"></span>
+          </div>
+
+          <button type="submit" class="btn btn-gold btn-login" id="loginBtn">
+            <span id="loginBtnText">🚀 Sign In as Admin</span>
+          </button>
+        </form>
+
+        <div class="login-footer">
+          Secure Admin Access Only
+        </div>
+      </div>
+
+      <!-- Participant Link -->
+      <a href="participant.html" class="participant-link">
+        👥 View as Participant →
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+  <script>
+    // Redirect if already logged in
+    if (localStorage.getItem('hct_admin') === 'true') {
+      window.location.href = 'admin.html';
+    }
+
+    function doLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const errEl = document.getElementById('errorMsg');
+      const errEl2 = document.getElementById('errorMsg2');
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('loginBtnText');
+
+      errEl.classList.remove('show');
+      errEl2.classList.remove('show');
+
+      if (!username || !password) {
+        document.getElementById('errorText2').textContent = 'Please fill in all fields.';
+        errEl2.classList.add('show');
+        return;
+      }
+
+      // Animate button
+      btnText.textContent = '⏳ Verifying...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        if (username === 'admin' && password === 'hunters@2026') {
+          localStorage.setItem('hct_admin', 'true');
+          btnText.textContent = '✅ Access Granted!';
+          showToast('Welcome back, Admin!', 'success');
+          setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+        } else {
+          errEl.classList.add('show');
+          document.getElementById('errorText').textContent = 'Invalid username or password. Please try again.';
+          btnText.textContent = '🚀 Sign In as Admin';
+          btn.disabled = false;
+          // Shake effect
+          errEl.style.animation = 'none';
+          void errEl.offsetWidth;
+          errEl.style.animation = 'fadeIn 0.3s ease';
+        }
+      }, 600);
+    }
+
+    // Allow Enter key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const form = document.getElementById('loginForm');
+        if (form) form.requestSubmit();
+      }
+    });
+  </script>
+</body>
+</html>
