@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Participant View – HUNTERS CRICKET TOURNAMENT</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* ── PARTICIPANT LAYOUT ── */
+        .participant-layout {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 200;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .sidebar-logo-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #fff, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+        }
+
+        .sidebar-section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            padding: 8px 12px 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-bottom: 2px;
+            border: 1px solid transparent;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+            background: rgba(246, 201, 14, 0.08);
+            border-color: rgba(246, 201, 14, 0.2);
+        }
+
+        .nav-item-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .nav-item-badge {
+            margin-left: auto;
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 20px;
+            display: none;
+        }
+
+        .nav-item-badge.show {
+            display: inline-block;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar */
+        .topbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-indicator {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-red);
+        }
+
+        .live-indicator.show {
+            display: flex;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .hamburger {
+            display: none;
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 7px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 28px;
+            flex: 1;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+            animation: fadeIn 0.35s ease;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-card.blue::before {
+            background: var(--accent-blue);
+        }
+
+        .stat-card.gold::before {
+            background: var(--accent-gold);
+        }
+
+        .stat-card.green::before {
+            background: var(--accent-green);
+        }
+
+        .stat-card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-card-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .stat-card-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 6px;
+        }
+
+        /* Match Cards */
+        .match-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .match-card:hover {
+            border-color: var(--border-bright);
+            box-shadow: var(--shadow-card);
+        }
+
+        .match-card.live {
+            border-color: rgba(239, 68, 68, 0.5);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.15);
+        }
+
+        .match-card.completed {
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .match-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .match-num {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .match-body {
+            padding: 16px 18px;
+        }
+
+        .match-teams-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .match-team-block {
+            flex: 1;
+            text-align: center;
+        }
+
+        .match-team-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .match-team-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .match-team-name.winner-team {
+            color: var(--accent-gold);
+        }
+
+        .match-score-block {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            margin-top: 4px;
+        }
+
+        .vs-circle {
+            width: 34px;
+            height: 34px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .match-result-bar {
+            background: rgba(16, 185, 129, 0.06);
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        /* Live Panel */
+        .live-panel {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.02));
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            animation: livePulse 2s ease-in-out infinite;
+        }
+
+        .live-panel-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scoreboard-teams {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .scoreboard-team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .scoreboard-team-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .scoreboard-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .scoreboard-overs {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .scoreboard-batting-label {
+            font-size: 0.7rem;
+            color: var(--accent-green);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        /* BRACKET */
+        .bracket-scroll {
+            overflow-x: auto;
+            padding-bottom: 16px;
+        }
+
+        .bracket-flow {
+            display: flex;
+            gap: 0;
+            align-items: flex-start;
+            min-width: max-content;
+        }
+
+        .bracket-round-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            min-width: 180px;
+            padding: 0 8px;
+        }
+
+        .bracket-round-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-blue-light);
+            text-align: center;
+            padding: 8px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+        }
+
+        .bracket-match-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .bracket-match-box.live {
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        .bracket-match-box.completed {
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .bracket-team-row {
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .bracket-team-row:last-child {
+            border-bottom: none;
+        }
+
+        .bracket-team-row.winner-row {
+            color: var(--accent-gold);
+            font-weight: 800;
+            background: rgba(246, 201, 14, 0.05);
+        }
+
+        .bracket-score {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .connector {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            padding: 0 4px;
+        }
+
+        /* Mobile sidebar */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .topbar {
+                padding: 12px 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .match-teams-row {
+                flex-direction: column;
+            }
+
+            .vs-circle {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icon">🏏</span>
+            <div class="sidebar-title">HUNTERS<br />CRICKET</div>
+            <div class="sidebar-subtitle">PARTICIPANT VIEW</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Overview</div>
+            <button class="nav-item active" id="nav-overview" onclick="showSection('overview')">
+                <span class="nav-item-icon">🏠</span> Dashboard
+            </button>
+            <button class="nav-item" id="nav-bracket" onclick="showSection('bracket')">
+                <span class="nav-item-icon">📊</span> Bracket View
+            </button>
+            <button class="nav-item" id="nav-live" onclick="showSection('live')">
+                <span class="nav-item-icon">🔴</span> Live Match
+                <span class="nav-item-badge" id="liveBadgeNav">LIVE</span>
+            </button>
+            <button class="nav-item" id="nav-matches" onclick="showSection('matches')">
+                <span class="nav-item-icon">📋</span> All Matches
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="btn btn-outline btn-sm" style="text-align:center;display:block;">
+                🔒 Admin Login
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                <div class="topbar-title" id="topbarTitle">Dashboard</div>
+            </div>
+            <div class="topbar-right">
+                <div class="live-indicator" id="topLiveIndicator">
+                    <span class="live-dot"></span>
+                    <span>MATCH LIVE</span>
+                </div>
+                <span style="font-size:0.8rem;color:var(--text-muted);">Participant</span>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- OVERVIEW -->
+            <div class="page-section active" id="section-overview">
+                <div class="section-header">
+                    <div class="section-icon">🏠</div>
+                    <div>
+                        <div class="section-title">Tournament Overview</div>
+                        <div class="section-subtitle">Real-time status and statistics</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="overviewStats"></div>
+
+                <div class="card" id="overviewLiveCard" style="display:none; margin-bottom: 24px;"></div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">📅 Recent Matches</div>
+                    </div>
+                    <div id="overviewRecentMatches" class="card-body"></div>
+                </div>
+            </div>
+
+            <!-- BRACKET -->
+            <div class="page-section" id="section-bracket">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <div>
+                        <div class="section-title">Tournament Bracket</div>
+                        <div class="section-subtitle">Full tournament flowchart</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="bracket-scroll">
+                        <div class="bracket-flow" id="bracketFlow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE MATCH -->
+            <div class="page-section" id="section-live">
+                <div class="section-header">
+                    <div class="section-icon">🔴</div>
+                    <div>
+                        <div class="section-title">Live Match</div>
+                        <div class="section-subtitle">Real-time scorecard</div>
+                    </div>
+                </div>
+                <div id="liveMatchContainer"></div>
+            </div>
+
+            <!-- ALL MATCHES -->
+            <div class="page-section" id="section-matches">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <div>
+                        <div class="section-title">All Matches</div>
+                        <div class="section-subtitle">Matches by round</div>
+                    </div>
+                </div>
+                <div id="allMatchesContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Champion Celebration Overlay -->
+    <div id="champOverlay"
+        style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.9); flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <h1
+            style="color:var(--accent-gold); font-size:4rem; margin-bottom:1rem; text-shadow: 0 0 20px var(--accent-gold); animation: pop 0.5s ease;">
+            🏆 TOURNAMENT CHAMPION 🏆</h1>
+        <h2 id="champName"
+            style="color:#fff; font-size:5rem; font-family:'Rajdhani', sans-serif; font-weight:900; letter-spacing:4px; text-transform:uppercase; animation: float 3s ease-in-out infinite;">
+        </h2>
+        <p style="color:var(--text-muted); font-size:1.2rem; margin-top:2rem;">Congratulations to the winning team!</p>
+        <button class="btn btn-outline" style="margin-top:2rem;"
+            onclick="document.getElementById('champOverlay').style.display='none'">Close</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let db = loadData();
+
+        function renderAll() {
+            db = loadData();
+            updateSidebarLiveBadge();
+            renderOverview();
+            renderBracket();
+            renderLiveSection();
+            renderAllMatches();
+            checkChampion();
+        }
+
+        // Section Navigation
+        function showSection(sec) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById(`section-${sec}`).classList.add('active');
+            let nav = document.getElementById(`nav-${sec}`);
+            if (nav) nav.classList.add('active');
+
+            const titles = {
+                'overview': 'Dashboard',
+                'bracket': 'Bracket View',
+                'live': 'Live Match',
+                'matches': 'All Matches'
+            };
+            document.getElementById('topbarTitle').textContent = titles[sec] || 'Participant View';
+            closeSidebar();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('show');
+        }
+
+        function updateSidebarLiveBadge() {
+            const liveMatch = getLiveMatch(db);
+            const badge = document.getElementById('liveBadgeNav');
+            const topInd = document.getElementById('topLiveIndicator');
+            if (liveMatch) {
+                badge.classList.add('show');
+                topInd.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+                topInd.classList.remove('show');
+            }
+        }
+
+        function renderOverview() {
+            const statsGrid = document.getElementById('overviewStats');
+            const total = db.matches.length;
+            const completed = db.matches.filter(m => m.status === HCT.STATUS.COMPLETED).length;
+            const live = getLiveMatch(db);
+
+            statsGrid.innerHTML = `
+                <div class="stat-card blue">
+                    <div class="stat-card-icon">🏏</div>
+                    <div class="stat-card-value">${total}</div>
+                    <div class="stat-card-label">Total Matches</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-card-icon">✅</div>
+                    <div class="stat-card-value">${completed}</div>
+                    <div class="stat-card-label">Completed</div>
+                </div>
+                <div class="stat-card ${live ? 'red' : 'gold'}">
+                    <div class="stat-card-icon">${live ? '🔴' : '⏳'}</div>
+                    <div class="stat-card-value">${live ? 1 : (total - completed)}</div>
+                    <div class="stat-card-label">${live ? 'Active Now' : 'Upcoming'}</div>
+                </div>
+            `;
+
+            // Recent Completed Matches
+            const recentContainer = document.getElementById('overviewRecentMatches');
+            const recentMatches = db.matches.filter(m => m.status === HCT.STATUS.COMPLETED).sort((a, b) => b.id - a.id).slice(0, 3);
+            if (recentMatches.length === 0) {
+                recentContainer.innerHTML = '<p class="text-center" style="color:var(--text-muted);padding:1rem;">No completed matches yet.</p>';
+            } else {
+                recentContainer.innerHTML = recentMatches.map(m => generateMatchCardHTML(m)).join('');
+            }
+        }
+
+        function generateMatchCardHTML(m) {
+            let badgeClass = '';
+            let badgeText = '';
+            if (m.status === HCT.STATUS.UPCOMING) { badgeClass = 'bg-blue text-white'; badgeText = 'UPCOMING'; }
+            if (m.status === HCT.STATUS.LIVE) { badgeClass = 'bg-red text-white blink'; badgeText = 'LIVE'; }
+            if (m.status === HCT.STATUS.COMPLETED) { badgeClass = 'bg-green text-white'; badgeText = 'COMPLETED'; }
+
+            const w1Class = m.winner && m.winner === m.teamA ? 'winner-team' : '';
+            const w2Class = m.winner && m.winner === m.teamB ? 'winner-team' : '';
+
+            let resultHtml = '';
+            if (m.status === HCT.STATUS.COMPLETED && m.winner) {
+                resultHtml = `<div class="match-result-bar">🏆 ${escapeHtml(m.winner)} won</div>`;
+            }
+
+            return `
+                <div class="match-card ${m.status.toLowerCase()}">
+                    <div class="match-top">
+                        <span class="match-num">MATCH #${m.matchNumber} &bull; ${getRoundName(m.round)}</span>
+                        <span class="badge ${badgeClass}" style="padding:4px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold;">${badgeText}</span>
+                    </div>
+                    <div class="match-body">
+                        <div class="match-teams-row">
+                            <div class="match-team-block">
+                                <div class="match-team-name ${w1Class}">${escapeHtml(m.teamA)}</div>
+                                <div class="match-score-block">${scoreStr(m.innings.first.team === m.teamA ? m.innings.first : m.innings.second)}</div>
+                            </div>
+                            <div class="vs-circle">VS</div>
+                            <div class="match-team-block">
+                                <div class="match-team-name ${w2Class}">${escapeHtml(m.teamB)}</div>
+                                <div class="match-score-block">${scoreStr(m.innings.first.team === m.teamB ? m.innings.first : m.innings.second)}</div>
+                            </div>
+                        </div>
+                    </div>
+                    ${resultHtml}
+                </div>
+            `;
+        }
+
+        function renderLiveSection() {
+            const container = document.getElementById('liveMatchContainer');
+            const m = getLiveMatch(db);
+            if (!m) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🏏</div>
+                        <p>No live match at the moment.<br><span style="font-size:0.85rem;color:var(--text-muted);">Check back later!</span></p>
+                    </div>
+                `;
+                return;
+            }
+
+            const act = getActiveInnings(m);
+            const inn = act ? act.innings : null;
+            const batName = inn ? inn.team : '—';
+            const bowlName = m.toss && inn ? (m.teamA === batName ? m.teamB : m.teamA) : '—';
+
+            container.innerHTML = `
+                <div class="live-panel">
+                    <div class="live-panel-title">
+                        <span class="live-dot"></span> MATCH #${m.matchNumber} LIVE
+                    </div>
+                    <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:20px; text-transform:uppercase; letter-spacing:1px; text-align:center;">
+                        ${m.toss ? `${m.toss.winner} won the toss and elected to ${m.toss.choice}` : 'Toss pending'}
+                    </div>
+                    <div class="scoreboard-teams">
+                        <div class="scoreboard-team" style="text-align:right;">
+                            <div class="scoreboard-batting-label">${batName === m.teamA ? 'BATTING' : (bowlName === m.teamA ? 'BOWLING' : '')}</div>
+                            <div class="scoreboard-team-name">${escapeHtml(m.teamA)}</div>
+                            <div class="scoreboard-score">${scoreShort(m.innings.first.team === m.teamA ? m.innings.first : m.innings.second)}</div>
+                        </div>
+                        <div class="scoreboard-separator">VS</div>
+                        <div class="scoreboard-team" style="text-align:left;">
+                            <div class="scoreboard-batting-label">${batName === m.teamB ? 'BATTING' : (bowlName === m.teamB ? 'BOWLING' : '')}</div>
+                            <div class="scoreboard-team-name">${escapeHtml(m.teamB)}</div>
+                            <div class="scoreboard-score">${scoreShort(m.innings.first.team === m.teamB ? m.innings.first : m.innings.second)}</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center; font-family:'Orbitron', monospace; color:var(--text-secondary); margin-top:20px; font-size:1.1rem;">
+                        Current Innings: ${scoreStr(inn)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAllMatches() {
+            const container = document.getElementById('allMatchesContainer');
+            if (db.matches.length === 0) {
+                container.innerHTML = '<p class="text-center" style="color:var(--text-muted);">No matches scheduled yet.</p>';
+                return;
+            }
+
+            let html = '';
+            HCT.ROUNDS.forEach(r => {
+                const matches = getMatchesByRound(db, r.id);
+                if (matches.length > 0) {
+                    html += `
+                        <div style="margin-bottom: 24px;">
+                            <h3 style="color:var(--accent-blue-light); margin-bottom:12px; font-family:'Rajdhani', sans-serif; text-transform:uppercase; letter-spacing:1px;">${r.name}</h3>
+                            <div class="grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px;">
+                                ${matches.map(m => generateMatchCardHTML(m)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        function renderBracket() {
+            const flow = document.getElementById('bracketFlow');
+            flow.innerHTML = '';
+            if (db.matches.length === 0) {
+                flow.innerHTML = '<div style="padding:20px; color:var(--text-muted);">Tournament not configured.</div>';
+                return;
+            }
+
+            HCT.ROUNDS.forEach((r, idx) => {
+                const mk = getMatchesByRound(db, r.id);
+                if (mk.length === 0) return;
+
+                const col = document.createElement('div');
+                col.className = 'bracket-round-col';
+
+                const lbl = document.createElement('div');
+                lbl.className = 'bracket-round-label';
+                lbl.textContent = r.name;
+                col.appendChild(lbl);
+
+                mk.forEach(m => {
+                    const bx = document.createElement('div');
+                    bx.className = `bracket-match-box ${m.status.toLowerCase()}`;
+
+                    const tAClass = (m.winner === m.teamA) ? 'winner-row' : '';
+                    const tBClass = (m.winner === m.teamB) ? 'winner-row' : '';
+
+                    const inA = m.innings.first.team === m.teamA ? m.innings.first : m.innings.second;
+                    const inB = m.innings.first.team === m.teamB ? m.innings.first : m.innings.second;
+
+                    bx.innerHTML = `
+                        <div style="font-size:0.6rem;text-align:center;color:#666;padding:2px 0;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border-color);">
+                            M${m.matchNumber} ${m.status === 'LIVE' ? '🔴' : ''}
+                        </div>
+                        <div class="bracket-team-row ${tAClass}">
+                            <span>${escapeHtml(m.teamA)}</span>
+                            <span class="bracket-score">${inA.team ? scoreShort(inA) : ''}</span>
+                        </div>
+                        <div class="bracket-team-row ${tBClass}">
+                            <span>${escapeHtml(m.teamB)}</span>
+                            <span class="bracket-score">${inB.team ? scoreShort(inB) : ''}</span>
+                        </div>
+                    `;
+                    col.appendChild(bx);
+                });
+
+                flow.appendChild(col);
+
+                const hasNext = HCT.ROUNDS[idx + 1] && getMatchesByRound(db, HCT.ROUNDS[idx + 1].id).length > 0;
+                if (hasNext) {
+                    const conn = document.createElement('div');
+                    conn.className = 'connector';
+                    conn.innerHTML = '―';
+                    flow.appendChild(conn);
+                }
+            });
+        }
+
+        function checkChampion() {
+            if (db.champion) {
+                const champOverlay = document.getElementById('champOverlay');
+                document.getElementById('champName').textContent = db.champion;
+                if (champOverlay.style.display !== 'flex') {
+                    champOverlay.style.display = 'flex';
+                }
+            } else {
+                document.getElementById('champOverlay').style.display = 'none';
+            }
+        }
+
+        // Initialize UI
+        renderAll();
+
+        // Refresh automatically for live scores
+        startLiveRefresh(() => {
+            const oldLive = getLiveMatch(db);
+            const oldDbChamp = db.champion;
+
+            db = loadData();
+
+            const newLive = getLiveMatch(db);
+            const newChamp = db.champion;
+
+            updateSidebarLiveBadge();
+            renderLiveSection();
+
+            // Re-render other parts if match states changed or new match live
+            renderOverview();
+            renderBracket();
+            renderAllMatches();
+
+            if (!oldDbChamp && newChamp) {
+                checkChampion();
+            }
+
+        }, 5000); // 5 sec interval
+
+    </script>
+</body>
+
+</html>
